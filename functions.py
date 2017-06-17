@@ -14,6 +14,14 @@ def map_runs(df):
     return runs
 
 
+def map_dict_to_list(runs):
+    dict_listed = []
+    sorted_keys = sorted(runs.keys())
+    for key in sorted_keys:
+        dict_listed.append(runs[key].values())
+    return dict_listed
+
+
 def get_closest_run_to_mean(mean, whitened, sorted_keys):
     min_diff = inf
     min_index = -1
