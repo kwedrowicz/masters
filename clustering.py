@@ -13,7 +13,10 @@ dictListed = map_dict_to_list(runs)
 
 features = array(dictListed)
 whitened = whiten(features)
-means = kmeans(whitened, parameters.k)
+means = kmeans(whitened, parameters.k, parameters.iters)
 
+results = []
 for mean in means[0]:
-    print get_closest_run_to_mean(mean, whitened, sorted_keys)
+    results.append(get_closest_run_to_mean(mean, whitened, sorted_keys))
+
+print(sorted(results))
