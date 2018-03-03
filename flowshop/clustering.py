@@ -1,11 +1,12 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import pairwise_distances_argmin_min
 from sklearn.preprocessing import StandardScaler
 
 
-def cluster(file_name, variance_percent=.95, clusters=10):
+def cluster(file_name, variance_percent=.95, clusters=10, plots=False):
     df = pd.read_csv('../resources/'+file_name, index_col='run_id')
     total = df['total']
 
@@ -21,6 +22,20 @@ def cluster(file_name, variance_percent=.95, clusters=10):
 
     # print(estimator.labels_)
     # print(estimator.cluster_centers_)
+    if plots:
+        plt_x = principalComponents[:, 0]
+        if principalComponents.shape[1] > 1:
+            plt_y = principalComponents[:, 1]
+        else:
+            plt_y = [1] * principalComponents.shape[0]
+
+        plt.scatter(plt_x, plt_y)
+        plt.title(file_name + " PCA")
+        plt.show()
+
+        plt.scatter(plt_x, plt_y, c=kmeans.labels_)
+        plt.title(file_name + " clustered")
+        plt.show()
 
     closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, principalComponents)
     run_ids = total.index.tolist()
