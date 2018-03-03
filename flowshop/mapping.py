@@ -1,25 +1,31 @@
 import pandas
+from flowshop.conditional_print import print_if
 
-df = pandas.read_csv('../resources/flowshop_raw.csv', sep=';', usecols=['run_id', 'instance_id', 'score'], dtype='int')
-runs = df.pivot(index='run_id', columns='instance_id', values='score')
-runs = runs.fillna(0).astype(int)
-print("Generated pivoted table")
 
-all_rows = runs.shape[0]
-deduplicated_runs = runs.drop_duplicates()
-deduplicated_rows = deduplicated_runs.shape[0]
-print("Removed {} from {} rows".format(all_rows-deduplicated_rows, all_rows))
+def prepare_runs(quantile=.7, printable=False):
+    df = pandas.read_csv('../resources/flowshop_raw.csv', sep=';', usecols=['run_id', 'instance_id', 'score'],
+                         dtype='int')
+    runs = df.pivot(index='run_id', columns='instance_id', values='score')
+    runs = runs.fillna(0).astype(int)
+    print_if("Generated pivoted table", boolean=printable)
 
-deduplicated_runs = deduplicated_runs.assign(total=deduplicated_runs.sum(axis=1).values)
-print("Added total row")
+    runs = runs[(runs.T != 0).any()]
+    print_if("Removed zero rows", boolean=printable)
 
-quantile7 = deduplicated_runs['total'].quantile(.3)
+    all_rows = runs.shape[0]
+    deduplicated_runs = runs.drop_duplicates()
+    deduplicated_rows = deduplicated_runs.shape[0]
+    print_if("Removed {} from {} rows".format(all_rows - deduplicated_rows, all_rows), boolean=printable)
 
-mask = deduplicated_runs['total'] <= quantile7
-best_runs = deduplicated_runs[mask]
-worst_runs = deduplicated_runs[~mask]
-print("Divided into best and worst runs")
+    deduplicated_runs = deduplicated_runs.assign(total=deduplicated_runs.sum(axis=1).values)
+    print_if("Added total row", boolean=printable)
 
-best_runs.to_csv('../resources/flowshop_best.csv')
-worst_runs.to_csv('../resources/flowshop_worst.csv')
-print("Saved runs to CSV")
+    quantile = deduplicated_runs['total'].quantile(1 - quantile)
+    mask = deduplicated_runs['total'] <= quantile
+    best_runs = deduplicated_runs[mask]
+    worst_runs = deduplicated_runs[~mask]
+    print_if("Divided into best and worst runs", boolean=printable)
+
+    best_runs.to_csv('../resources/flowshop_best.csv')
+    worst_runs.to_csv('../resources/flowshop_worst.csv')
+    print_if("Saved runs to CSV", boolean=printable)
