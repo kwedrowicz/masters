@@ -29,7 +29,7 @@ print(centroid_runs)
 
 total = total.to_frame().assign(cluster=kmeans.labels_)
 
-idx = total.groupby(['cluster'], sort=True)['total'].transform(max) == total['total']
+idx = total.groupby(['cluster'], sort=True)['total'].transform(min) == total['total']
 best_in_clusters = total[idx].sort_values(by=['cluster'])
 
 print(best_in_clusters)
