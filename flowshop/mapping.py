@@ -9,8 +9,11 @@ def prepare_runs(quantile=.7, printable=False):
     runs = runs.fillna(0).astype(int)
     print_if("Generated pivoted table", boolean=printable)
 
+    zero_rows_count = runs.shape[0]
     runs = runs[(runs.T != 0).any()]
-    print_if("Removed zero rows", boolean=printable)
+    non_zero_rows_count = runs.shape[0]
+
+    print_if("Removed {} zero rows from {} rows".format(zero_rows_count-non_zero_rows_count, zero_rows_count), boolean=printable)
 
     all_rows = runs.shape[0]
     deduplicated_runs = runs.drop_duplicates()
@@ -24,7 +27,7 @@ def prepare_runs(quantile=.7, printable=False):
     mask = deduplicated_runs['total'] <= quantile
     best_runs = deduplicated_runs[mask]
     worst_runs = deduplicated_runs[~mask]
-    print_if("Divided into best and worst runs", boolean=printable)
+    print_if("Divided into {} best and {} worst runs".format(best_runs.shape[0], worst_runs.shape[0]), boolean=printable)
 
     best_runs.to_csv('../resources/flowshop_best.csv')
     worst_runs.to_csv('../resources/flowshop_worst.csv')

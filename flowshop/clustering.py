@@ -4,9 +4,13 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import pairwise_distances_argmin_min
 from sklearn.preprocessing import StandardScaler
+from flowshop.conditional_print import print_if
 
 
 def cluster(file_name, variance_percent=.95, clusters=10, plots=False):
+
+    print_if("Clustering {} for {} clusters with {} variance".format(file_name, clusters, variance_percent), boolean=True)
+
     df = pd.read_csv('../resources/'+file_name, index_col='run_id')
     total = df['total']
 
@@ -17,10 +21,15 @@ def cluster(file_name, variance_percent=.95, clusters=10, plots=False):
     x = StandardScaler().fit_transform(df.values.astype(float))
     principalComponents = pca.fit_transform(x)
 
+    # print(principalComponents)
+    print_if("PCA reduced to {} dimensions".format(principalComponents.shape[1]), boolean=True)
+
     kmeans = KMeans(n_clusters=clusters)
     kmeans.fit(principalComponents)
 
-    # print(estimator.labels_)
+    # print(kmeans.labels_)
+    print_if("RunId - clusted id tuples: ", boolean=True)
+    print_if(list(zip(total.index.tolist(), kmeans.labels_)), boolean=True)
     # print(estimator.cluster_centers_)
     if plots:
         plt_x = principalComponents[:, 0]
