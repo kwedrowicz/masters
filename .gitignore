@@ -1,2 +1,5 @@
 *.pyc
 venv
+/resources/plots/
+/resources/csv/flowshop_best.csv
+/resources/csv/flowshop_worst.csv

@@ -2,11 +2,15 @@ import pandas
 from flowshop.conditional_print import print_if
 
 
-def prepare_runs(quantile=.7, printable=False):
-    df = pandas.read_csv('../resources/flowshop_raw.csv', sep=';', usecols=['run_id', 'instance_id', 'score'],
-                         dtype='int')
-    runs = df.pivot(index='run_id', columns='instance_id', values='score')
-    runs = runs.fillna(0).astype(int)
+def prepare_runs(source_path='../resources/csv/flowshop_raw.csv', quantile=.7, printable=False, flattened=False):
+    if flattened:
+        runs = pandas.read_csv(source_path, sep=',', index_col='run_id', dtype='float')
+        print(runs)
+    else:
+        df = pandas.read_csv(source_path, sep=';', usecols=['run_id', 'instance_id', 'score'],
+                             dtype='int')
+        runs = df.pivot(index='run_id', columns='instance_id', values='score')
+    runs = runs.fillna(0).astype(float)
     print_if("Generated pivoted table", boolean=printable)
 
     zero_rows_count = runs.shape[0]
@@ -29,6 +33,6 @@ def prepare_runs(quantile=.7, printable=False):
     worst_runs = deduplicated_runs[~mask]
     print_if("Divided into {} best and {} worst runs".format(best_runs.shape[0], worst_runs.shape[0]), boolean=printable)
 
-    best_runs.to_csv('../resources/flowshop_best.csv')
-    worst_runs.to_csv('../resources/flowshop_worst.csv')
+    best_runs.to_csv('../resources/csv/flowshop_best.csv')
+    worst_runs.to_csv('../resources/csv/flowshop_worst.csv')
     print_if("Saved runs to CSV", boolean=printable)
