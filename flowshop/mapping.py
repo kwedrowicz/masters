@@ -5,7 +5,6 @@ from flowshop.conditional_print import print_if
 def prepare_runs(source_path='../resources/csv/flowshop_raw.csv', quantile=.7, printable=False, flattened=False):
     if flattened:
         runs = pandas.read_csv(source_path, sep=',', index_col='run_id', dtype='float')
-        print(runs)
     else:
         df = pandas.read_csv(source_path, sep=';', usecols=['run_id', 'instance_id', 'score'],
                              dtype='int')

@@ -8,11 +8,7 @@ def extract_base_name(file_path):
     return os.path.splitext(base)[0]
 
 
-def draw_plots(features, estimator, file_path, labels):
-
-    print("Plot")
-    print(features)
-
+def draw_plots(features, estimator, file_path, labels, total, representatives):
     plt_x = features[:, 0]
     if features.shape[1] > 1:
         plt_y = features[:, 1]
@@ -29,5 +25,18 @@ def draw_plots(features, estimator, file_path, labels):
 
     plt.scatter(plt_x, plt_y, c=labels)
     plt.title(titlecase(base_name) + " Clustered(" + estimator_name + ")")
+
+    for representative_id in representatives:
+        rep = total.loc[representative_id]
+        i = total.index.tolist().index(representative_id)
+        plt.annotate(
+            # "{} -> {} ({})".format(rep.name, rep.total, rep.cluster),
+            rep.total,
+            xy=(plt_x[i], plt_y[i]),
+            xytext=(-10, 20),
+            textcoords='offset points',
+            arrowprops=dict(arrowstyle='->')
+        )
+
     plt.savefig("../resources/plots/" + base_name + "_" + snakecase(estimator_name) + "_clustered.png")
     plt.close()

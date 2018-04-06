@@ -8,7 +8,7 @@ from flowshop.conditional_print import print_if
 from flowshop.draw_plot import draw_plots
 
 
-def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm='KMeans'):
+def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm='GaussianMixture'):
     print_if("Clustering {} for {} clusters with {} variance".format(file_path, clusters, variance_percent),
              boolean=True)
 
@@ -21,6 +21,7 @@ def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm=
     pca = PCA(variance_percent)
     x = StandardScaler().fit_transform(df.values.astype(float))
     principalComponents = pca.fit_transform(x)
+
     bandwidth = cl.estimate_bandwidth(principalComponents, quantile=.2)
 
     # print(principalComponents)
@@ -38,7 +39,7 @@ def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm=
     clustering_algorithms = (
         ('KMeans', kmeans),
         ('MeanShift', meanshift),
-        ('SpectralClustering', spectral),
+        # ('SpectralClustering', spectral),
         # ('Ward', ward),
         # ('DBSCAN', dbscan),
         ('Birch', birch),
@@ -64,8 +65,6 @@ def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm=
 
     print_if(list(zip(total.index.tolist(), labels)), boolean=True)
     # print(estimator.cluster_centers_)
-    if plots:
-        draw_plots(principalComponents, chosenEstimator, file_path, labels)
 
     if hasattr(chosenEstimator, 'cluster_centers_'):
         means = chosenEstimator.cluster_centers_
@@ -90,4 +89,9 @@ def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm=
     best_in_clusters = total[idx].sort_values(by=['cluster'])
     best_in_cluster_runs = best_in_clusters.index.values.tolist()
 
-    return centroid_runs + best_in_cluster_runs
+    clusters_representatives = centroid_runs + best_in_cluster_runs
+
+    if plots:
+        draw_plots(principalComponents, chosenEstimator, file_path, labels, total, clusters_representatives)
+
+    return clusters_representatives
