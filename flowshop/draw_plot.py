@@ -20,7 +20,7 @@ def draw_plots(features, estimator, file_path, labels, total, representatives):
 
     plt.scatter(plt_x, plt_y)
     plt.title(titlecase(base_name) + " PCA")
-    plt.savefig("../resources/plots/" + base_name + "_pca.png")
+    plt.savefig("resources/plots/" + base_name + "_pca.png")
     plt.close()
 
     plt.scatter(plt_x, plt_y, c=labels)
@@ -38,5 +38,5 @@ def draw_plots(features, estimator, file_path, labels, total, representatives):
             arrowprops=dict(arrowstyle='->')
         )
 
-    plt.savefig("../resources/plots/" + base_name + "_" + snakecase(estimator_name) + "_clustered.png")
+    plt.savefig("resources/plots/" + base_name + "_" + snakecase(estimator_name) + "_clustered.png")
     plt.close()

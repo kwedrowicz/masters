@@ -1,6 +1,6 @@
 import getopt
+import os
 import sys
-from os import path
 
 from flowshop.clustering import cluster
 from flowshop.conditional_print import print_if
@@ -38,9 +38,9 @@ def main(argv):
     print_if("Variance percent: ", variance, boolean=printable)
     print_if("Clusters: ", clusters, boolean=printable)
 
-    prepare_runs('../resources/csv/flowshop_raw.csv', quantile, printable, flattened=False)
-    best_run_ids = cluster(path.abspath('../resources/csv/flowshop_best.csv'), variance, clusters)
-    worst_run_ids = cluster(path.abspath('../resources/csv/flowshop_worst.csv'), variance, clusters)
+    prepare_runs('resources/csv/flowshop_raw.csv', quantile, printable, flattened=False)
+    best_run_ids = cluster(os.path.abspath('resources/csv/flowshop_best.csv'), variance, clusters)
+    worst_run_ids = cluster(os.path.abspath('resources/csv/flowshop_worst.csv'), variance, clusters)
 
     run_ids = sorted(best_run_ids+worst_run_ids)
 

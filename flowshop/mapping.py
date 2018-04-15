@@ -32,6 +32,6 @@ def prepare_runs(source_path='../resources/csv/flowshop_raw.csv', quantile=.7, p
     worst_runs = deduplicated_runs[~mask]
     print_if("Divided into {} best and {} worst runs".format(best_runs.shape[0], worst_runs.shape[0]), boolean=printable)
 
-    best_runs.to_csv('../resources/csv/flowshop_best.csv')
-    worst_runs.to_csv('../resources/csv/flowshop_worst.csv')
+    best_runs.to_csv('resources/csv/flowshop_best.csv')
+    worst_runs.to_csv('resources/csv/flowshop_worst.csv')
     print_if("Saved runs to CSV", boolean=printable)
