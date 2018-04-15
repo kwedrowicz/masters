@@ -12,10 +12,11 @@ def main(argv):
     variance = .95
     clusters = 5
     printable = False
+    source = "resources/csv/flowshop_raw.csv"
     try:
-        opts, args = getopt.getopt(argv, "hpq:v:c:", ["quantile=", "variance=", "clusters="])
+        opts, args = getopt.getopt(argv, "hps:q:v:c:", ["source=", "quantile=", "variance=", "clusters="])
     except getopt.GetoptError:
-        print('main.py --quantile .7 --variance .95 --clusters 5')
+        print('main.py --source resources/csv/flowshop_raw.csv --quantile .7 --variance .95 --clusters 5')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -24,6 +25,8 @@ def main(argv):
             sys.exit()
         elif opt == '-p':
             printable = True
+        elif opt == '--source':
+            source = opt
         elif opt == '--quantile':
             quantile = float(arg)
         elif opt == '--variance':
@@ -38,9 +41,9 @@ def main(argv):
     print_if("Variance percent: ", variance, boolean=printable)
     print_if("Clusters: ", clusters, boolean=printable)
 
-    prepare_runs('resources/csv/flowshop_raw.csv', quantile, printable, flattened=False)
-    best_run_ids = cluster(os.path.abspath('resources/csv/flowshop_best.csv'), variance, clusters)
-    worst_run_ids = cluster(os.path.abspath('resources/csv/flowshop_worst.csv'), variance, clusters)
+    prepare_runs(source, quantile, printable, flattened=False)
+    best_run_ids = cluster(os.path.abspath('resources/csv/best.csv'), variance, clusters)
+    worst_run_ids = cluster(os.path.abspath('resources/csv/worst.csv'), variance, clusters)
 
     run_ids = sorted(best_run_ids+worst_run_ids)
 
