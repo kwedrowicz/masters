@@ -8,7 +8,7 @@ from flowshop.conditional_print import print_if
 from flowshop.draw_plot import draw_plots
 
 
-def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm='GaussianMixture'):
+def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm='GaussianMixture', bests=True, value_tags=True):
     print_if("Clustering {} for {} clusters with {} variance".format(file_path, clusters, variance_percent),
              boolean=True)
 
@@ -85,13 +85,15 @@ def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm=
 
     total = total.to_frame().assign(cluster=labels)
 
-    idx = total.groupby(['cluster'], sort=True)['total'].transform(min) == total['total']
-    best_in_clusters = total[idx].sort_values(by=['cluster'])
-    best_in_cluster_runs = best_in_clusters.index.values.tolist()
-
-    clusters_representatives = centroid_runs + best_in_cluster_runs
+    if bests:
+        idx = total.groupby(['cluster'], sort=True)['total'].transform(min) == total['total']
+        best_in_clusters = total[idx].sort_values(by=['cluster'])
+        best_in_cluster_runs = best_in_clusters.index.values.tolist()
+        clusters_representatives = centroid_runs + best_in_cluster_runs
+    else:
+        clusters_representatives = centroid_runs
 
     if plots:
-        draw_plots(principalComponents, chosenEstimator, file_path, labels, total, clusters_representatives)
+        draw_plots(principalComponents, chosenEstimator, file_path, labels, total, clusters_representatives, value_tags=value_tags)
 
     return clusters_representatives

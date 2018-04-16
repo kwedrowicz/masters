@@ -11,10 +11,13 @@ def main(argv):
     quantile = .7
     variance = .95
     clusters = 5
+    flattened = False
     printable = False
+    bests = False
+    value_tags = False
     source = "resources/csv/flowshop_raw.csv"
     try:
-        opts, args = getopt.getopt(argv, "hps:q:v:c:", ["source=", "quantile=", "variance=", "clusters="])
+        opts, args = getopt.getopt(argv, "hpfs:q:v:c:b:t:", ["source=", "quantile=", "variance=", "clusters=", "bests=", "value_tags="])
     except getopt.GetoptError:
         print('main.py --source resources/csv/flowshop_raw.csv --quantile .7 --variance .95 --clusters 5')
         sys.exit(2)
@@ -25,14 +28,20 @@ def main(argv):
             sys.exit()
         elif opt == '-p':
             printable = True
+        elif opt == '-f':
+            flattened = True
         elif opt == '--source':
-            source = opt
+            source = arg
         elif opt == '--quantile':
             quantile = float(arg)
         elif opt == '--variance':
             variance = float(arg)
         elif opt == '--clusters':
             clusters = int(arg)
+        elif opt == '--bests':
+            bests = bool(arg)
+        elif opt == '--value_tags':
+            value_tags = bool(value_tags)
         else:
             raise IOError('Option not found')
 
@@ -41,9 +50,10 @@ def main(argv):
     print_if("Variance percent: ", variance, boolean=printable)
     print_if("Clusters: ", clusters, boolean=printable)
 
-    prepare_runs(source, quantile, printable, flattened=False)
-    best_run_ids = cluster(os.path.abspath('resources/csv/best.csv'), variance, clusters)
-    worst_run_ids = cluster(os.path.abspath('resources/csv/worst.csv'), variance, clusters)
+    prepare_runs(source, quantile, printable, flattened=flattened)
+    print("VALUE", value_tags)
+    best_run_ids = cluster(os.path.abspath('resources/csv/best.csv'), variance, clusters, bests=bests, value_tags=value_tags)
+    worst_run_ids = cluster(os.path.abspath('resources/csv/worst.csv'), variance, clusters, bests=bests, value_tags=value_tags)
 
     run_ids = sorted(best_run_ids+worst_run_ids)
 
