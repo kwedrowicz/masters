@@ -2,8 +2,8 @@ import pandas
 from numpy import array
 from scipy.cluster.vq import kmeans, whiten
 
-import parameters
-from functions import map_runs, get_closest_run_to_mean, map_dict_to_list
+from lumberjack import parameters
+from lumberjack.functions import map_runs, get_closest_run_to_mean, map_dict_to_list
 
 df = pandas.read_csv('resources/out.csv', sep=';', usecols=parameters.cols)
 runs = map_runs(df)

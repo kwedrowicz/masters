@@ -1,6 +1,6 @@
 import pandas
 
-import parameters
+from lumberjack import parameters
 
 df = pandas.read_csv('resources/out.csv', sep=';', usecols=parameters.cols, dtype='int')
 runs = df.pivot(index='runId', columns='instanceId', values='score')
