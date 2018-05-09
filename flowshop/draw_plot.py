@@ -26,18 +26,18 @@ def draw_plots(features, estimator, file_path, labels, total, representatives, v
     plt.scatter(plt_x, plt_y, c=labels)
     plt.title(titlecase(base_name) + " Clustered(" + estimator_name + ")")
 
-    for representative_id in representatives:
-        rep = total.loc[representative_id]
-        i = total.index.tolist().index(representative_id)
-        plt.annotate(
-            # "{} -> {} ({})".format(rep.name, rep.total, rep.cluster),
-            # rep.total,
-            rep.total if value_tags else int(rep.name),
-            xy=(plt_x[i], plt_y[i]),
-            xytext=(-10, 20),
-            textcoords='offset points',
-            arrowprops=dict(arrowstyle='->')
-        )
+    # for representative_id in representatives:
+    #     rep = total.loc[representative_id]
+    #     i = total.index.tolist().index(representative_id)
+    #     plt.annotate(
+    #         # "{} -> {} ({})".format(rep.name, rep.total, rep.cluster),
+    #         # rep.total,
+    #         rep.total if value_tags else int(rep.name),
+    #         xy=(plt_x[i], plt_y[i]),
+    #         xytext=(-10, 20),
+    #         textcoords='offset points',
+    #         arrowprops=dict(arrowstyle='->')
+    #     )
 
     plt.savefig("resources/plots/" + base_name + "_" + snakecase(estimator_name) + "_clustered.png")
     plt.close()

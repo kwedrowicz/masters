@@ -8,7 +8,7 @@ from flowshop.conditional_print import print_if
 from flowshop.draw_plot import draw_plots
 
 
-def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm='GaussianMixture', bests=True, value_tags=True):
+def cluster(file_path, variance_percent=.95, clusters=10, plots=True, algorithm='KMeans', bests=True, value_tags=True):
     print_if("Clustering {} for {} clusters with {} variance".format(file_path, clusters, variance_percent),
              boolean=True)
 

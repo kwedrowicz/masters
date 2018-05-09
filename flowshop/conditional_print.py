@@ -1,3 +1,3 @@
-def print_if(*args, boolean):
+def print_if(message, boolean):
     if boolean:
-        print(args)
+        print(message)
