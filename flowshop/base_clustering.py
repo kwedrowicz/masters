@@ -1,4 +1,5 @@
 from optparse import OptionParser
+
 import pandas
 from sklearn.metrics import pairwise_distances_argmin_min
 
@@ -6,6 +7,7 @@ from flowshop.functions.clustering import cluster_by_estimator
 from flowshop.functions.conditional_print import print_if
 from flowshop.functions.draw_plot import draw_plots
 from flowshop.functions.pca import pca_reduce
+from flowshop.functions.set_divide import set_divide
 
 
 def main():
@@ -13,17 +15,25 @@ def main():
 
     print_params(options)
     runs = prepare_data(options)
-    cluster(runs, options)
+    bests, worsts = set_divide(runs, options.quantile, options.printable)
+
+    best_centroids = cluster(bests, options, 'Bests')
+    worst_centeroids = cluster(worsts, options, 'Worsts')
+
+    all_centroids = sorted(best_centroids + worst_centeroids)
+    print_if("All centroids: {}".format(all_centroids), options.printable)
 
 
 def get_options_from_command():
     parser = OptionParser()
-    parser.add_option("-s", "--source", dest="source", type="string", default="resources/csv/space.csv",
+    parser.add_option("-s", "--source", dest="source", type="string", default="resources/csv/flowshop_raw.csv",
                       help="path to source file")
     parser.add_option("-v", "--variance", dest="variance", type="float", default=.8, help="variance for PCA")
-    parser.add_option("-c", "--clusters", dest="clusters", type="int", default=10, help="number of clusters")
+    parser.add_option("-c", "--clusters", dest="clusters", type="int", default=5, help="number of clusters")
     parser.add_option("-p", "--printable", dest="printable", action="store_true", default=False,
                       help="print additional info during executing")
+    parser.add_option("-q", "--quantile", dest="quantile", type="float", default=.3,
+                      help='quantile to divide data to best and worst sets')
     parser.add_option("-e", "--estimator", dest="estimator", default="KMeans", help="estimator for clustering")
 
     (options, args) = parser.parse_args()
@@ -39,7 +49,9 @@ def print_params(options):
 
 
 def prepare_data(options):
-    runs = pandas.read_csv(options.source, sep=',', index_col='run_id', dtype='float')
+    df = pandas.read_csv(options.source, sep=';', usecols=['run_id', 'instance_id', 'score'],
+                         dtype='float')
+    runs = df.pivot(index='run_id', columns='instance_id', values='score')
     runs = runs.fillna(0).astype(float)
     print_if("Generated pivoted table", boolean=options.printable)
 
@@ -59,7 +71,7 @@ def prepare_data(options):
     return deduplicated_runs
 
 
-def cluster(runs, options):
+def cluster(runs, options, title):
     principal_components = pca_reduce(runs, options.variance)
 
     estimator = cluster_by_estimator(principal_components, options.estimator, options.clusters)
@@ -73,7 +85,10 @@ def cluster(runs, options):
     run_ids = runs.index.astype(int).tolist()
     print_if(list(zip(run_ids, labels)), boolean=True)
 
-    total = pandas.DataFrame({'labels': labels}, index=run_ids)
+    total = pandas.DataFrame({'labels': labels, 'total': runs.total}, index=run_ids)
+    idx = total.groupby(['labels'], sort=True)['total'].transform(min) == total['total']
+    best_in_clusters = total[idx].sort_values(by=['labels']).drop_duplicates()
+    best_in_cluster_runs = best_in_clusters.index.values.tolist()
 
     if hasattr(estimator, 'cluster_centers_'):
         means = estimator.cluster_centers_
@@ -87,12 +102,12 @@ def cluster(runs, options):
         for index, row in medians.iterrows():
             closest, _ = pairwise_distances_argmin_min([row.values.tolist() + [index]], grouped.get_group(index))
             centroid_runs.append(grouped.get_group(index).iloc[[closest[0]]].index.tolist()[0])
-
     print_if("Centroid runs: {}".format(centroid_runs), boolean=True)
-    draw_plots(principal_components, estimator, labels, 'Belgian',  total, centroid_runs,
-               value_tags=False)
+    print_if("Best runs: {}".format(best_in_cluster_runs), boolean=True)
+    representatives = centroid_runs + best_in_cluster_runs
+    draw_plots(principal_components, estimator, labels, title, total, representatives, value_tags=True)
 
-    return centroid_runs
+    return representatives
 
 
 if __name__ == "__main__":
