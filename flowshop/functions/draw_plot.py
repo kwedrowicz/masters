@@ -12,7 +12,7 @@ def draw_plots(features, estimator, labels, title, total, representatives, value
     plt_x, plt_y = get_coordinates(features)
 
     draw_pca(plt_x, plt_y, title)
-    draw_clustered(plt_x, plt_y, estimator, labels, title, total, representatives, value_tags)
+    draw_clustered(plt_x, plt_y, title, estimator, labels, total, representatives, value_tags)
 
 
 def get_coordinates(features):
@@ -31,7 +31,7 @@ def draw_pca(x, y, title):
     plt.close()
 
 
-def draw_clustered(x, y, estimator, labels, title, total, representatives, value_tags):
+def draw_clustered(x, y, title, estimator, labels, total, representatives, value_tags):
     estimator_name = estimator.__class__.__name__
 
     plt.scatter(x, y, c=labels)
