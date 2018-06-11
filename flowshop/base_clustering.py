@@ -3,7 +3,7 @@ from flowshop.functions.clustering import cluster_by_estimator, get_labels, get_
 from flowshop.functions.common_options import common_options
 from flowshop.functions.conditional_print import print_if
 from flowshop.functions.data_preparations import remove_zero_rows, remove_duplicates
-from flowshop.functions.draw_plot import draw_plots
+from flowshop.functions.draw_plot import draw_plots, draw_representatives_bars
 from flowshop.functions.pca import pca_reduce
 from flowshop.functions.print_params import print_params
 from flowshop.functions.set_divide import set_divide
@@ -16,8 +16,8 @@ def main():
     runs = prepare_data(options)
     bests, worsts = set_divide(runs, options.quantile, options.printable)
 
-    best_representatives = cluster(bests, options, 'Bests')
-    worst_representatives = cluster(worsts, options, 'Worsts')
+    best_representatives = cluster(bests, options, 'Zbiór najlepszych')
+    worst_representatives = cluster(worsts, options, 'Zbiór pozostałych')
 
     all_representatives = sorted(best_representatives + worst_representatives)
     print_if("All representatives: {}".format(all_representatives), options.printable)
@@ -66,6 +66,7 @@ def cluster(runs, options, title):
     print_if("Best runs: {}".format(best_in_cluster_runs), boolean=True)
     representatives = centroid_runs + best_in_cluster_runs
     draw_plots(principal_components, estimator, labels, title, total, representatives, value_tags=True)
+    draw_representatives_bars(representatives, total, title, estimator)
 
     return representatives
 

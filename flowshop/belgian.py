@@ -3,7 +3,7 @@ from flowshop.functions.clustering import cluster_by_estimator, get_labels, get_
 from flowshop.functions.common_options import common_options
 from flowshop.functions.conditional_print import print_if
 from flowshop.functions.data_preparations import remove_zero_rows, remove_duplicates
-from flowshop.functions.draw_plot import draw_plots
+from flowshop.functions.draw_plot import draw_plots, draw_representatives_bars
 from flowshop.functions.pca import pca_reduce
 from flowshop.functions.print_params import print_params
 
@@ -36,6 +36,10 @@ def prepare_data(options):
 
 
 def cluster(runs, options):
+
+    runs_total = runs[['total']]
+    runs = runs.drop(columns=['total'])
+
     principal_components = pca_reduce(runs, options.variance)
 
     estimator = cluster_by_estimator(principal_components, options.estimator, options.clusters)
@@ -45,12 +49,18 @@ def cluster(runs, options):
     run_ids = runs.index.astype(int).tolist()
     print_if(list(zip(run_ids, labels)), boolean=True)
 
-    total = pandas.DataFrame({'labels': labels}, index=run_ids)
+    total = pandas.DataFrame({'labels': labels, 'total': runs_total.total}, index=run_ids)
+    idx = total.groupby(['labels'], sort=True)['total'].transform(min) == total['total']
+    best_in_clusters = total[idx].sort_values(by=['labels']).drop_duplicates()
+    best_in_cluster_runs = best_in_clusters.index.values.tolist()
 
     centroid_runs = get_representatives(estimator, principal_components, run_ids, labels, options.printable)
 
-    draw_plots(principal_components, estimator, labels, 'Belgian',  total, centroid_runs,
-               value_tags=False)
+    representatives = centroid_runs + best_in_cluster_runs
+
+    draw_plots(principal_components, estimator, labels, 'Metoda belgijska',  total, representatives,
+               value_tags=True)
+    draw_representatives_bars(representatives, total, 'Metoda belgijska', estimator)
 
     return centroid_runs
 
