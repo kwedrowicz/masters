@@ -48,8 +48,6 @@ def draw_clustered(x, y, title, estimator, labels, total, representatives, value
         rep = total.loc[representative_id]
         i = total.index.tolist().index(representative_id)
         plt.annotate(
-            # "{} -> {} ({})".format(rep.name, rep.total, rep.cluster),
-            # rep.total,
             rep.total if value_tags else int(rep.name),
             xy=(x[i], y[i]),
             xytext=(-10, 20),
